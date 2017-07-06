@@ -70,23 +70,12 @@ class AioMqttClient(object):
     def _wrap_callback(self, name):
         """Add the named callback to the MQTT client which triggers a call to
         the wrapper's registered callback in the event loop thread.
-        
-        Also creates an asyncio.Event called _name_event where "name" is the
-        name supplied to this function. This event is set whenever the callback
-        is called.
         """
-        event = asyncio.Event(loop=self._loop)
-        
         setattr(self, name, None)
-        setattr(self, "_{}_event".format(name), event)
-        
         def wrapper(_client, *args):
-            self._loop.call_soon_threadsafe(event.set)
-            
             f = getattr(self, name)
             if f is not None:
                 self._loop.call_soon_threadsafe(f, self, *args)
-        
         setattr(self._client, name, wrapper)
     
     def _wrap_blocking_method(self, name):
