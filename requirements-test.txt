@@ -1,0 +1,6 @@
+# Test suite requirements
+pytest>=2.6
+pytest-asyncio
+flake8
+mock
+

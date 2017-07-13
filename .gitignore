@@ -1,0 +1,11 @@
+*.pyc
+*.swp
+*~
+.*
+
+pip-selfcheck.json
+bin/
+include/
+lib/
+dist/
+*.egg-info/
