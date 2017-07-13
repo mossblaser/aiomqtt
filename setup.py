@@ -11,6 +11,7 @@ setup(
     # Metadata for PyPi
     url="https://github.com/mossblaser/aiomqtt",
     author="Jonathan Heathcote",
+    author_email="mail@jhnet.co.uk",
     description="An AsyncIO asynchronous wrapper around paho-mqtt.",
     license="GPLv2",
     classifiers=[
