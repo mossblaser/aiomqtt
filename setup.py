@@ -13,13 +13,13 @@ setup(
     author="Jonathan Heathcote",
     author_email="mail@jhnet.co.uk",
     description="An AsyncIO asynchronous wrapper around paho-mqtt.",
-    license="GPLv2",
+    license="Eclipse Public License v1.0 / Eclipse Distribution License v1.0",
     classifiers=[
         "Development Status :: 3 - Alpha",
 
         "Intended Audience :: Developers",
 
-        "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+        "License :: OSI Approved",
 
         "Operating System :: POSIX :: Linux",
         "Operating System :: Microsoft :: Windows",
