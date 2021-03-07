@@ -10,29 +10,28 @@ import asyncio
 import aiomqtt
 
 
-@pytest.fixture("module")
+@pytest.fixture(scope="module")
 def port():
     # A port which is likely to be free for the duration of tests...
     return 11223
 
 
-@pytest.fixture("module")
+@pytest.fixture(scope="module")
 def hostname():
     return "localhost"
 
 
-@pytest.fixture("module")
+@pytest.fixture(scope="module")
 def event_loop():
     return asyncio.get_event_loop()
 
 
-@pytest.yield_fixture(scope="module")
+@pytest.fixture(scope="module")
 def server(event_loop, port):
     mosquitto = event_loop.run_until_complete(asyncio.create_subprocess_exec(
         "mosquitto", "-p", str(port),
         stdout=asyncio.subprocess.DEVNULL,
-        stderr=asyncio.subprocess.DEVNULL,
-        loop=event_loop))
+        stderr=asyncio.subprocess.DEVNULL))
 
     try:
         yield
@@ -69,7 +68,7 @@ async def test_connect_and_loop_forever(server, hostname, port, event_loop):
     c = aiomqtt.Client(loop=event_loop)
 
     # Immediately disconnect on connection
-    connect_event = asyncio.Event(loop=event_loop)
+    connect_event = asyncio.Event()
 
     def on_connect(client, userdata, flags, rc):
         assert client is c
@@ -82,7 +81,7 @@ async def test_connect_and_loop_forever(server, hostname, port, event_loop):
     c.on_connect = Mock(side_effect=on_connect)
 
     # Just check disconnect event is as expected
-    disconnect_event = asyncio.Event(loop=event_loop)
+    disconnect_event = asyncio.Event()
 
     def on_disconnect(client, userdata, rc):
         assert client is c
@@ -94,7 +93,7 @@ async def test_connect_and_loop_forever(server, hostname, port, event_loop):
 
     # When the client disconnects, this call should end
     c.connect_async(hostname, port)
-    await asyncio.wait_for(c.loop_forever(), timeout=5, loop=event_loop)
+    await asyncio.wait_for(c.loop_forever(), timeout=5)
 
     # Should definately have connected and disconnected
     assert connect_event.is_set()
@@ -108,16 +107,16 @@ async def test_loop_start_stop(server, hostname, port, event_loop):
     """Tests that starting/stopping the loop works as expected."""
     c = aiomqtt.Client(loop=event_loop)
 
-    connect_event = asyncio.Event(loop=event_loop)
+    connect_event = asyncio.Event()
     c.on_connect = Mock(side_effect=lambda *_: connect_event.set())
 
     # Wait or the client to connect
     c.loop_start()
     c.connect_async(hostname, port)
-    await asyncio.wait_for(connect_event.wait(), timeout=5, loop=event_loop)
+    await asyncio.wait_for(connect_event.wait(), timeout=5)
 
     # Wait for shutdown
-    await asyncio.wait_for(c.loop_stop(), timeout=5, loop=event_loop)
+    await asyncio.wait_for(c.loop_stop(), timeout=5)
 
 
 @pytest.mark.asyncio
@@ -127,38 +126,38 @@ async def test_pub_sub(server, hostname, port, event_loop):
     """
     c = aiomqtt.Client(loop=event_loop)
 
-    connect_event = asyncio.Event(loop=event_loop)
+    connect_event = asyncio.Event()
     c.on_connect = Mock(side_effect=lambda *_: connect_event.set())
 
-    subscribe_event = asyncio.Event(loop=event_loop)
+    subscribe_event = asyncio.Event()
     c.on_subscribe = Mock(side_effect=lambda *_: subscribe_event.set())
 
-    publish_event = asyncio.Event(loop=event_loop)
+    publish_event = asyncio.Event()
     c.on_publish = Mock(side_effect=lambda *_: publish_event.set())
 
-    message_event = asyncio.Event(loop=event_loop)
+    message_event = asyncio.Event()
     c.on_message = Mock(side_effect=lambda *_: message_event.set())
 
     # For message_callback_add
-    message_callback_event = asyncio.Event(loop=event_loop)
+    message_callback_event = asyncio.Event()
     message_callback = Mock(
         side_effect=lambda *_: message_callback_event.set())
 
-    unsubscribe_event = asyncio.Event(loop=event_loop)
+    unsubscribe_event = asyncio.Event()
     c.on_unsubscribe = Mock(side_effect=lambda *_: unsubscribe_event.set())
 
     c.loop_start()
     try:
         c.connect_async(hostname, port)
         await asyncio.wait_for(
-            connect_event.wait(), timeout=5, loop=event_loop)
+            connect_event.wait(), timeout=5)
 
         # Test subscription
         result, mid = c.subscribe("test")
         assert result == aiomqtt.MQTT_ERR_SUCCESS
         assert mid is not None
         await asyncio.wait_for(
-            subscribe_event.wait(), timeout=5, loop=event_loop)
+            subscribe_event.wait(), timeout=5)
         c.on_subscribe.assert_called_once_with(c, None, mid, (0,))
 
         # Test publishing
@@ -167,12 +166,12 @@ async def test_pub_sub(server, hostname, port, event_loop):
         assert result == aiomqtt.MQTT_ERR_SUCCESS
         assert mid is not None
         await asyncio.wait_for(
-            message_info.wait_for_publish(), timeout=5, loop=event_loop)
+            message_info.wait_for_publish(), timeout=5)
         c.on_publish.assert_called_once_with(c, None, mid)
 
         # Test message arrives
         await asyncio.wait_for(
-            message_event.wait(), timeout=5, loop=event_loop)
+            message_event.wait(), timeout=5)
         assert len(c.on_message.mock_calls) == 1
         assert c.on_message.mock_calls[0][1][0] is c
         assert c.on_message.mock_calls[0][1][1] is None
@@ -187,7 +186,7 @@ async def test_pub_sub(server, hostname, port, event_loop):
 
         # Test message arrives
         await asyncio.wait_for(
-            message_callback_event.wait(), timeout=5, loop=event_loop)
+            message_callback_event.wait(), timeout=5)
         assert len(message_callback.mock_calls) == 1
         assert message_callback.mock_calls[0][1][0] is c
         assert message_callback.mock_calls[0][1][1] is None
@@ -199,11 +198,11 @@ async def test_pub_sub(server, hostname, port, event_loop):
         assert result == aiomqtt.MQTT_ERR_SUCCESS
         assert mid is not None
         await asyncio.wait_for(
-            unsubscribe_event.wait(), timeout=5, loop=event_loop)
+            unsubscribe_event.wait(), timeout=5)
         c.on_unsubscribe.assert_called_once_with(c, None, mid)
 
     finally:
-        await asyncio.wait_for(c.loop_stop(), timeout=5, loop=event_loop)
+        await asyncio.wait_for(c.loop_stop(), timeout=5)
 
     assert len(c.on_connect.mock_calls) == 1
     assert len(c.on_subscribe.mock_calls) == 1
