@@ -3,7 +3,7 @@ This test suite functions more as a sanity check than a comprehensive test.
 """
 
 import pytest
-from mock import Mock
+from unittest.mock import Mock
 
 import asyncio
 
