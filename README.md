@@ -32,7 +32,7 @@ async def demo():
     c = aiomqtt.Client(loop)
     c.loop_start()  # See "About that loop..." below.
 
-    connected = asyncio.Event(loop=loop)
+    connected = asyncio.Event()
     def on_connect(client, userdata, flags, rc):
         connected.set()
     c.on_connect = on_connect
@@ -41,7 +41,7 @@ async def demo():
     await connected.wait()
     print("Connected!")
 
-    subscribed = asyncio.Event(loop=loop)
+    subscribed = asyncio.Event()
     def on_subscribe(client, userdata, mid, granted_qos):
         subscribed.set()
     c.on_subscribe = on_subscribe
@@ -58,10 +58,10 @@ async def demo():
     await message_info.wait_for_publish()
     print("Message published!")
 
-    await asyncio.sleep(1, loop=loop)
+    await asyncio.sleep(1)
     print("Disconnecting...")
 
-    disconnected = asyncio.Event(loop=loop)
+    disconnected = asyncio.Event()
     def on_disconnect(client, userdata, rc):
         disconnected.set()
     c.on_disconnect = on_disconnect
