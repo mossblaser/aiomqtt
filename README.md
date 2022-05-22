@@ -9,6 +9,21 @@ Installation:
 
     pip install aiomqtt
 
+You might prefer [`asyncio-mqtt`](https://github.com/sbtinstruments/asyncio-mqtt)
+---------------------------------------------------------------------------------
+
+Whilst you're welcome to use this library, you're probably better off using
+[`asyncio-mqtt`](https://github.com/sbtinstruments/asyncio-mqtt) intead.
+`asyncio-mqtt` is a a really slick and idiomatic asyncio MQTT library (also
+built on paho-mqtt). As well as being much easier to use, it is also much more
+actively maintained.
+
+By contrast this library is just 61
+[SLOC](https://en.wikipedia.org/wiki/Source_lines_of_code) of Python and is
+intended to be as thin a wrapper around paho-mqtt as possible. It is also
+maintained on a very limited basis.
+
+
 API
 ---
 
