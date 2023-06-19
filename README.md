@@ -1,5 +1,21 @@
-`aiomqtt`: An asyncio Wrapper for paho-mqtt
-===========================================
+Deprecated
+==========
+
+**This library has been deprecated and the 'aiomqtt' name handed over to the
+project formally known as
+[`asyncio-mqtt`](https://github.com/sbtinstruments/aiomqtt).**
+
+This legacy aiomqtt library will continue to exist via PyPI with versions <
+1.0.0 with only essential maintaince on a "best effort" basis and no further
+development.
+
+New projects are encouraged to try the [new
+qiomqtt](https://github.com/sbtinstruments/aiomqtt) project instead which
+features a much more idiomatic Python API.
+
+
+`aiomqtt` (v0.x): An asyncio Wrapper for paho-mqtt
+==================================================
 
 This library implements a minimal Python 3
 [asyncio](https://docs.python.org/3/library/asyncio.html) wrapper around the
